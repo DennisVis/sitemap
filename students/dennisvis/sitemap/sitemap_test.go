@@ -13,7 +13,7 @@ import (
 
 var (
 	testURL, _         = url.Parse("https://example.org")
-	generatorUnderTest = Generator{testURL}
+	generatorUnderTest = Generator{testURL, 100}
 )
 
 func createTestAnchors() []link.Anchor {
@@ -185,7 +185,7 @@ func Test_Generate_WhenGivenTestSite_ShouldGenerateSitemap(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
-	generator := Generator{URL: testURL}
+	generator := Generator{URL: testURL, MaxDepth: 5}
 	expected := `<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><url><loc>http://localhost:8090/</loc></url><url><loc>http://localhost:8090/about/</loc></url><url><loc>http://localhost:8090/contact/</loc></url><url><loc>http://localhost:8090/something-else/</loc></url><url><loc>http://localhost:8090/about/more-info/</loc></url></urlset>`
 
 	serveTestSite()

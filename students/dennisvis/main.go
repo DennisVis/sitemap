@@ -29,7 +29,7 @@ func main() {
 	fmt.Printf("Going to generate sitemap for [%s]...\n", url.String())
 
 	start := time.Now()
-	sitemap, err := sitemap.Generator{URL: url}.Generate()
+	sitemap, err := sitemap.Generator{URL: url, MaxDepth: 3}.Generate()
 	if err != nil {
 		panic(err)
 	}

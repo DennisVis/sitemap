@@ -11,7 +11,8 @@ import (
 
 // Generator takes a url.URL and allows for generating a sitemap for the domain given in that url.URL
 type Generator struct {
-	URL *url.URL
+	URL      *url.URL
+	MaxDepth int
 }
 
 func (g Generator) toSitemap(anchors []link.Anchor) string {
@@ -56,7 +57,7 @@ func (g Generator) appendOrIgnore(anchors []link.Anchor, anchor link.Anchor) []l
 	return anchors
 }
 
-func (g Generator) getDomainAnchors(anchorsToVisit, anchorsVisited []link.Anchor) []link.Anchor {
+func (g Generator) getDomainAnchors(anchorsToVisit, anchorsVisited []link.Anchor, currentDepth int) []link.Anchor {
 	anchorsToVisitNext := make([]link.Anchor, 0)
 
 	for _, anchor := range anchorsToVisit {
@@ -84,8 +85,8 @@ func (g Generator) getDomainAnchors(anchorsToVisit, anchorsVisited []link.Anchor
 		}
 	}
 
-	if len(anchorsToVisitNext) > 0 {
-		return g.getDomainAnchors(anchorsToVisitNext, anchorsVisited)
+	if len(anchorsToVisitNext) > 0 && currentDepth+1 <= g.MaxDepth {
+		return g.getDomainAnchors(anchorsToVisitNext, anchorsVisited, currentDepth+1)
 	}
 
 	return anchorsVisited
@@ -95,7 +96,8 @@ func (g Generator) getDomainAnchors(anchorsToVisit, anchorsVisited []link.Anchor
 func (g Generator) Generate() (sitemap string, err error) {
 	anchorsToVisit := make([]link.Anchor, 1)
 	anchorsToVisit[0] = link.Anchor(g.toAbsHrefAnchor(link.Anchor{Href: "/", Text: ""}))
-	allAnchors := g.getDomainAnchors(anchorsToVisit, make([]link.Anchor, 0))
+
+	allAnchors := g.getDomainAnchors(anchorsToVisit, make([]link.Anchor, 0), 0)
 
 	sitemap = g.toSitemap(allAnchors)
 
